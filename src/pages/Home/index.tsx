@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import MainMenu from "../../Components/Menu/MainMenu";
@@ -16,9 +16,26 @@ import {
 import { Container } from "../../styles/Home";
 import ReactApexChart from "react-apexcharts";
 import { TableComponets } from "../../Components/TableComponets/Table";
+import api from "../../Services/api";
 
 const Home: React.FC = () => {
+  const [ordersSold, setOrderSsold] = useState<
+    { value: number; growth: number } | undefined
+  >(undefined);
+  const [ticketmonth, seTicketmonth] = useState<
+    { value: number; growth: number } | undefined
+  >(undefined);
+  const [ticketDay, setTicketDay] = useState<
+    { value: number; growth: number } | undefined
+  >(undefined);
+  const [alerts, setAlerts] = useState<
+    { type: string; value: number; since: number } | undefined
+  >(undefined);
+  const [ordersMonth, setOrdersmonth] = useState<
+    { value: number; growth: number } | undefined
+  >(undefined);
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -26,6 +43,53 @@ const Home: React.FC = () => {
       toast.error("Você precisa fazer login para acessar esta página.");
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const TicketMonth = async () => {
+      const response = await api.get("/avg-ticket-month");
+      const data = response.data;
+      seTicketmonth(data);
+    };
+    TicketMonth();
+  }, []);
+
+  useEffect(() => {
+    const TicketDay = async () => {
+      const response = await api.get("/avg-ticket-day");
+      const data = response.data;
+      setTicketDay(data);
+    };
+    TicketDay();
+  }, []);
+
+  useEffect(() => {
+    const Alerts = async () => {
+      console.log(alerts);
+      const response = await api.get("/alerts");
+      const data = response.data;
+      setAlerts(data);
+    };
+    Alerts();
+  }, []);
+
+  useEffect(() => {
+    const OrdersMonth = async () => {
+      const response = await api.get("/orders-month");
+      const data = response.data;
+      setOrdersmonth(data);
+    };
+    OrdersMonth();
+  }, []);
+  useEffect(() => {
+    api
+      .get("/orders-month")
+      .then((response) => {
+        setOrderSsold(response.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar os dados dos pedidos:", error);
+      });
+  }, []);
 
   const options: ApexCharts.ApexOptions = {
     series: [
@@ -115,7 +179,7 @@ const Home: React.FC = () => {
     ],
   };
   return (
-    <Container className="container">
+    <Container>
       <Grid
         templateAreas={`"header header"
                   "nav main"
@@ -130,7 +194,7 @@ const Home: React.FC = () => {
         <GridItem pl="2" area={"header"}>
           <MainMenu />
         </GridItem>
-        <GridItem pl="2" area={"nav"}>
+        <GridItem pl="2" className="nav" area={"nav"}>
           <OptionsMenu />
         </GridItem>
         <GridItem pl="5" area={"main"}>
@@ -145,39 +209,66 @@ const Home: React.FC = () => {
                 <Heading size="md">Ticket médio últimas 24h</Heading>
               </CardHeader>
               <CardBody className="cards-body-home">
-                <Text>+ 15 %</Text>
-                <Text>em relação a ontem</Text>
-                <h4>R$ 9.292,00</h4>
+                {ticketDay ? (
+                  <>
+                    <Text>{ticketDay.value}</Text>
+                    <Text>{ticketDay.growth}</Text>
+                    <h4></h4>
+                  </>
+                ) : (
+                  <p>Carregando...</p>
+                )}
               </CardBody>
             </Card>
+
             <Card className="cards-home">
               <CardHeader>
                 <Heading size="md">Ticket médio mensal</Heading>
               </CardHeader>
               <CardBody className="cards-body-home">
-                <Text>aaaa</Text>
-                <Text></Text>
-                <h4>R$ 9.292,00</h4>
+                {ticketmonth ? (
+                  <>
+                    <Text>{ticketmonth.value}</Text>
+                    <Text>{ticketmonth.growth}</Text>
+                    <h4></h4>
+                  </>
+                ) : (
+                  <p>Carregando...</p>
+                )}
               </CardBody>
             </Card>
             <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md">Produtos em manutenção</Heading>
-              </CardHeader>
-              <CardBody className="cards-body-home">
-                <Text></Text>
-                <Text></Text>
-                <h4></h4>
-              </CardBody>
+              {alerts ? (
+                <>
+                  <CardHeader>
+                    <Heading size="md">{alerts.type}</Heading>
+                  </CardHeader>
+                  <CardBody className="cards-body-home">
+                    <>
+                      <Text>{alerts.value}</Text>
+                      <Text>{alerts.since}</Text>
+                      <h4></h4>
+                    </>
+                  </CardBody>
+                </>
+              ) : (
+                <p>Carregando...</p>
+              )}
             </Card>
             <Card className="cards-home">
               <CardHeader>
                 <Heading size="md">Acabando o estoque</Heading>
               </CardHeader>
               <CardBody className="cards-body-home">
-                <Text></Text>
-                <Text></Text>
-                <h4></h4>
+                {ordersMonth ? (
+                  <>
+                    <Text>{ordersMonth.value}</Text>
+                    <Text>{ordersMonth.growth}</Text>
+                    <h4></h4>
+                  </>
+                ) : (
+                  <p>Carregando...</p>
+                )}
               </CardBody>
             </Card>
             <Card className="cards-home">
@@ -185,8 +276,15 @@ const Home: React.FC = () => {
                 <Heading size="md">Pedidos realizados no mês</Heading>
               </CardHeader>
               <CardBody className="cards-body-home">
-                <Text></Text>
-                <Text></Text>
+                {ordersSold ? (
+                  <>
+                    <Text>{ordersSold.value}</Text>
+                    <Text>{ordersSold.growth}</Text>
+                  </>
+                ) : (
+                  <p>Carregando...</p>
+                )}
+
                 <h4></h4>
               </CardBody>
             </Card>
@@ -194,14 +292,14 @@ const Home: React.FC = () => {
           <h3>Dashboard de vendas</h3>
           <SimpleGrid
             spacing={4}
-            templateColumns="repeat(auto-fill, minmax(500px, 1fr))"
-            className="Cards-home"
+            templateColumns="repeat(auto-fill, minmax(300px, 1fr))"
+            className="simple-grid"
           >
-            <Card className="cards-grafic">
+            <Card className="cards-home">
               <CardHeader>
                 <Heading size="md"> Pedidos por Mês</Heading>
               </CardHeader>
-              <CardBody>
+              <CardBody className="cards-grafic">
                 <div className="chart">
                   <ReactApexChart
                     options={options}
@@ -216,7 +314,7 @@ const Home: React.FC = () => {
               <CardHeader>
                 <Heading size="md"> Expectativa de lucro x lucro real</Heading>
               </CardHeader>
-              <CardBody>
+              <CardBody className="cards-grafic">
                 <Text>
                   View a summary of all your customers over the last month.
                 </Text>
@@ -228,7 +326,7 @@ const Home: React.FC = () => {
                   Pedidos realizados x pedidos cancelados
                 </Heading>
               </CardHeader>
-              <CardBody>
+              <CardBody className="cards-grafic">
                 <Text>
                   View a summary of all your customers over the last month.
                 </Text>
@@ -238,11 +336,12 @@ const Home: React.FC = () => {
 
           <SimpleGrid
             spacing={4}
-            templateColumns="repeat(auto-fill, minmax(700px, 1fr))"
-            className="Cards-home"
+            templateColumns="repeat(auto-fill, minmax(1000px, 1fr))"
           >
-            <Card>
-              <TableComponets />
+            <Card className="card-products">
+              <div className="container">
+                <TableComponets />
+              </div>
             </Card>
           </SimpleGrid>
         </GridItem>

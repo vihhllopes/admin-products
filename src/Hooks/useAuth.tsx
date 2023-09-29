@@ -21,7 +21,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [permissions, setPermissions] = useState(false);
 
   useEffect(() => {
-    // Verificar se o usuário já possui um token JWT válido (por exemplo, em localStorage)
     const token = localStorage.getItem("jwtToken");
     if (token) {
       setPermissions(true);
