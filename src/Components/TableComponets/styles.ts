@@ -35,9 +35,9 @@ export const Container = styled.div`
     word-wrap: break-word;
     white-space: normal;
     .td-space {
-      width: 250px; /* Defina a largura desejada para todas as células */
-      white-space: nowrap; /* Evita que o texto quebre em várias linhas */
-      overflow: hidden; /* Oculta o conteúdo que não couber na célula */
+      width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
       text-overflow: ellipsis;
     }
 
