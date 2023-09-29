@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const Container = styled.div`
   position: fixed;
@@ -9,7 +9,7 @@ export const Container = styled.div`
   transform: translate(-50%, -50%);
   background: #ffffff 0% 0% no-repeat padding-box;
   opacity: 1;
-  font-family: 'Ubuntu', sans-serif;
+  font-family: "Ubuntu", sans-serif;
   .logo {
     position: fixed;
     top: 50%;
@@ -33,7 +33,7 @@ export const Container = styled.div`
       opacity: 1;
       width: 400px;
     }
-    button {
+    .button-login {
       width: 120px;
       height: 40px;
       background: #5a4ca7 0% 0% no-repeat padding-box;
@@ -41,6 +41,7 @@ export const Container = styled.div`
       opacity: 1;
       display: block;
       margin: 50px auto 0;
+      color: #fff;
     }
   }
 `;
