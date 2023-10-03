@@ -41,7 +41,7 @@ const Login: React.FC = () => {
     } catch (error) {
       toast.error("Erro ao fazer login");
     } finally {
-      setIsLoading(false); // Desative o indicador de carregamento após a conclusão do login
+      setIsLoading(false);
     }
   };
   const PasswordVisibility = () => {

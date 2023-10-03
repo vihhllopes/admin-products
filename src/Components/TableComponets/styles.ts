@@ -1,15 +1,17 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  margin-top: 40px;
+  .grid-products {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+  }
   .table-products {
-    top: 30px;
     width: 100%;
     margin-bottom: 40px;
     justify-content: space-between;
     display: block;
     align-items: center;
-    width: 80%;
     margin: 0 auto;
     text-align: center;
     padding: 20px;
@@ -30,7 +32,6 @@ export const Container = styled.div`
     color: #4e5d66;
     font-weight: 400;
     width: 100%;
-    max-width: 900px;
     padding: 0;
     word-wrap: break-word;
     white-space: normal;
@@ -46,6 +47,18 @@ export const Container = styled.div`
       word-wrap: break-word;
       white-space: normal;
       padding: 0;
+    }
+  }
+  .button-next-page {
+    float: right;
+    font-weight: normal;
+    color: #667a86;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    svg {
+      color: #000;
+      font-size: 1.5rem;
     }
   }
 `;

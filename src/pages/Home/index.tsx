@@ -9,15 +9,25 @@ import {
   Grid,
   GridItem,
   Card,
-  SimpleGrid,
   Heading,
   CardBody,
+  Center,
+  Flex,
+  Select,
 } from "@chakra-ui/react";
 import { Container } from "../../styles/Home";
-import ReactApexChart from "react-apexcharts";
 import { TableComponets } from "../../Components/TableComponets/Table";
 import api from "../../Services/api";
+import { GraficOrdernsMonth } from "../../Components/Grafic/Orders/GraficOrdernsMonth";
+import { GraficPlacedCanceled } from "../../Components/Grafic/Orders/GraficPlacedCanceled";
+import { GraficExpectation } from "../../Components/Grafic/GraficExpectation";
+import { AppWrapper } from "../../styles/Global";
 
+interface Alert {
+  type: string;
+  value: number;
+  since: string;
+}
 const Home: React.FC = () => {
   const [ordersSold, setOrderSsold] = useState<
     { value: number; growth: number } | undefined
@@ -28,14 +38,11 @@ const Home: React.FC = () => {
   const [ticketDay, setTicketDay] = useState<
     { value: number; growth: number } | undefined
   >(undefined);
-  const [alerts, setAlerts] = useState<
-    { type: string; value: number; since: number } | undefined
-  >(undefined);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
   const [ordersMonth, setOrdersmonth] = useState<
     { value: number; growth: number } | undefined
   >(undefined);
   const navigate = useNavigate();
-
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (!token) {
@@ -91,262 +98,197 @@ const Home: React.FC = () => {
       });
   }, []);
 
-  const options: ApexCharts.ApexOptions = {
-    series: [
-      {
-        name: "Inflation",
-        data: [2.3, 3.1, 4.0, 10.1, 4.0, 3.6, 3.2, 2.3, 1.4, 0.8, 0.5, 0.2],
-      },
-    ],
-    chart: {
-      height: 350,
-      type: "bar" as const,
-    },
-    plotOptions: {
-      bar: {
-        borderRadius: 10,
-        dataLabels: {
-          position: "top",
-        },
-      },
-    },
-    dataLabels: {
-      enabled: true,
-      formatter: function (val: number) {
-        // Ajuste a função para receber um número
-        return val + "%";
-      },
-      offsetY: -20,
-      style: {
-        fontSize: "12px",
-        colors: ["#011d33"],
-      },
-    },
-    xaxis: {
-      categories: [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ],
-      position: "top",
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      crosshairs: {
-        fill: {
-          type: "gradient",
-          gradient: {
-            colorFrom: "#D8E3F0",
-            colorTo: "#13202f",
-            stops: [0, 100],
-            opacityFrom: 0.4,
-            opacityTo: 0.5,
-          },
-        },
-      },
-      tooltip: {
-        enabled: true,
-      },
-    },
-    yaxis: [
-      {
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-        labels: {
-          show: false,
-          formatter: function (val: number) {
-            // Ajuste a função para receber um número
-            return val + "%";
-          },
-        },
-      },
-    ],
-  };
   return (
-    <Container>
-      <Grid
-        templateAreas={`"header header"
+    <AppWrapper>
+      <Container>
+        <Grid
+          templateAreas={`"header header"
                   "nav main"
                   "nav footer"`}
-        gridTemplateRows={"100px 6fr 100px"}
-        gridTemplateColumns={"150px 1fr"}
-        h="700px"
-        gap="1"
-        color="blackAlpha.700"
-        fontWeight="bold"
-      >
-        <GridItem pl="2" area={"header"}>
-          <MainMenu />
-        </GridItem>
-        <GridItem pl="2" className="nav" area={"nav"}>
-          <OptionsMenu />
-        </GridItem>
-        <GridItem pl="5" area={"main"}>
-          <h1>Início</h1>
-          <SimpleGrid
-            spacing={4}
-            templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-            className="simple-grid"
-          >
-            <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md">Ticket médio últimas 24h</Heading>
-              </CardHeader>
-              <CardBody className="cards-body-home">
-                {ticketDay ? (
-                  <>
-                    <Text>{ticketDay.value}</Text>
-                    <Text>{ticketDay.growth}</Text>
-                    <h4></h4>
-                  </>
-                ) : (
-                  <p>Carregando...</p>
-                )}
-              </CardBody>
-            </Card>
-
-            <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md">Ticket médio mensal</Heading>
-              </CardHeader>
-              <CardBody className="cards-body-home">
-                {ticketmonth ? (
-                  <>
-                    <Text>{ticketmonth.value}</Text>
-                    <Text>{ticketmonth.growth}</Text>
-                    <h4></h4>
-                  </>
-                ) : (
-                  <p>Carregando...</p>
-                )}
-              </CardBody>
-            </Card>
-            <Card className="cards-home">
-              {alerts ? (
-                <>
+          gridTemplateRows={"100px 6fr 100px"}
+          gridTemplateColumns={"150px 1fr"}
+          h="700px"
+          gap="1"
+          color="blackAlpha.700"
+          fontWeight="bold"
+        >
+          <GridItem area={"header"}>
+            <MainMenu />
+          </GridItem>
+          <GridItem className="nav" area={"nav"}>
+            <OptionsMenu />
+          </GridItem>
+          <GridItem pl="5" area={"main"}>
+            <h1>Início</h1>
+            <div className="card-container">
+              <Card className="cards-home">
+                <CardHeader>
+                  <Heading size="md">Ticket médio últimas 24h</Heading>
+                </CardHeader>
+                <CardBody className="cards-body-home">
+                  {ticketDay ? (
+                    <>
+                      <Text className="grownt">{ticketDay.growth}%</Text>
+                      <Text>em relação a ontem</Text>
+                      <Flex>
+                        <h4>R$</h4>
+                        <strong>{ticketDay.value}</strong>
+                      </Flex>
+                    </>
+                  ) : (
+                    <p>Carregando...</p>
+                  )}
+                </CardBody>
+              </Card>
+              <Card className="cards-home">
+                <CardHeader>
+                  <Heading size="md">Ticket médio mensal</Heading>
+                </CardHeader>
+                <CardBody className="cards-body-home">
+                  {ticketmonth ? (
+                    <>
+                      <Text className="grownt">{ticketmonth.growth}%</Text>
+                      <Text>em relação a julho</Text>
+                      <Flex>
+                        <h4>R$</h4>
+                        <strong>{ticketmonth.value}</strong>
+                      </Flex>
+                    </>
+                  ) : (
+                    <p>Carregando...</p>
+                  )}
+                </CardBody>
+              </Card>
+              {alerts.map((alert, index) => (
+                <Card key={index} className="cards-home">
                   <CardHeader>
-                    <Heading size="md">{alerts.type}</Heading>
+                    <Heading size="md">{alert.type}</Heading>
                   </CardHeader>
                   <CardBody className="cards-body-home">
-                    <>
-                      <Text>{alerts.value}</Text>
-                      <Text>{alerts.since}</Text>
-                      <h4></h4>
-                    </>
+                    {index === 0 ? (
+                      <>
+                        <Text className="alerts">{alert.since}</Text>
+                        <Flex>
+                          <strong>{alert.value}</strong>
+                          <h4>Produtos</h4>
+                        </Flex>
+                      </>
+                    ) : index === 1 ? (
+                      <>
+                        <Text className="alerts">{alert.since}</Text>
+                        <Text className="alerts">repor o quanto antes</Text>
+                        <Flex>
+                          <strong>{alert.value}</strong>
+                          <h4>Produtos</h4>
+                        </Flex>
+                      </>
+                    ) : (
+                      <p>Carregando...</p>
+                    )}
                   </CardBody>
-                </>
-              ) : (
-                <p>Carregando...</p>
-              )}
-            </Card>
-            <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md">Acabando o estoque</Heading>
-              </CardHeader>
-              <CardBody className="cards-body-home">
-                {ordersMonth ? (
-                  <>
-                    <Text>{ordersMonth.value}</Text>
-                    <Text>{ordersMonth.growth}</Text>
-                    <h4></h4>
-                  </>
-                ) : (
-                  <p>Carregando...</p>
-                )}
-              </CardBody>
-            </Card>
-            <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md">Pedidos realizados no mês</Heading>
-              </CardHeader>
-              <CardBody className="cards-body-home">
-                {ordersSold ? (
-                  <>
-                    <Text>{ordersSold.value}</Text>
-                    <Text>{ordersSold.growth}</Text>
-                  </>
-                ) : (
-                  <p>Carregando...</p>
-                )}
+                </Card>
+              ))}
+              <Card className="cards-home">
+                <CardHeader>
+                  <Heading size="md">Pedidos realizados no mês </Heading>
+                </CardHeader>
+                <CardBody className="cards-body-home">
+                  {ordersMonth ? (
+                    <>
+                      <Text className="grownt">{ordersMonth.growth}</Text>
+                      <Text>em relação a julho</Text>
+                      <Flex>
+                        <strong>{ordersMonth.value}</strong>
+                        <h4>Pedidos</h4>
+                      </Flex>
+                    </>
+                  ) : (
+                    <p>Carregando...</p>
+                  )}
+                </CardBody>
+              </Card>
+              <Card className="cards-home">
+                <CardHeader>
+                  <Heading size="md">Produtos vendidos no mês</Heading>
+                </CardHeader>
+                <CardBody className="cards-body-home">
+                  {ordersSold ? (
+                    <>
+                      <Text className="grownt">{ordersSold.growth}</Text>
+                      <Text>em relação a julho</Text>
+                      <Flex>
+                        <strong>{ordersSold.value}</strong>
+                        <h4>Pedidos</h4>
+                      </Flex>
+                    </>
+                  ) : (
+                    <p>Carregando...</p>
+                  )}
 
-                <h4></h4>
-              </CardBody>
-            </Card>
-          </SimpleGrid>
-          <h3>Dashboard de vendas</h3>
-          <SimpleGrid
-            spacing={4}
-            templateColumns="repeat(auto-fill, minmax(300px, 1fr))"
-            className="simple-grid"
-          >
-            <Card className="cards-home">
-              <CardHeader>
-                <Heading size="md"> Pedidos por Mês</Heading>
-              </CardHeader>
-              <CardBody className="cards-grafic">
-                <div className="chart">
-                  <ReactApexChart
-                    options={options}
-                    series={options.series}
-                    type="bar"
-                    height={350}
-                  />
+                  <h4></h4>
+                </CardBody>
+              </Card>
+            </div>
+            <h3>Dashboard de vendas</h3>
+            <div className="card-container-grafic">
+              <Card className="cards-grafic">
+                <div className="input-grafic">
+                  <Heading size="md"> Pedidos por Mês</Heading>
+                  <Select name="Categorias" required>
+                    <option value="Raiz">Ano</option>
+                  </Select>
                 </div>
-              </CardBody>
-            </Card>
-            <Card className="cards-grafic">
-              <CardHeader>
-                <Heading size="md"> Expectativa de lucro x lucro real</Heading>
-              </CardHeader>
-              <CardBody className="cards-grafic">
-                <Text>
-                  View a summary of all your customers over the last month.
-                </Text>
-              </CardBody>
-            </Card>
-            <Card className="cards-grafic">
-              <CardHeader>
-                <Heading size="md">
-                  Pedidos realizados x pedidos cancelados
-                </Heading>
-              </CardHeader>
-              <CardBody className="cards-grafic">
-                <Text>
-                  View a summary of all your customers over the last month.
-                </Text>
-              </CardBody>
-            </Card>
-          </SimpleGrid>
-
-          <SimpleGrid
-            spacing={4}
-            templateColumns="repeat(auto-fill, minmax(1000px, 1fr))"
-          >
-            <Card className="card-products">
-              <div className="container">
-                <TableComponets />
-              </div>
-            </Card>
-          </SimpleGrid>
-        </GridItem>
-      </Grid>
-    </Container>
+                <CardBody className="cards-grafic">
+                  <div className="chart">
+                    {" "}
+                    <div style={{ height: "200px", width: "400px" }}>
+                      <GraficOrdernsMonth />
+                    </div>
+                  </div>
+                </CardBody>
+              </Card>
+              <Card className="cards-grafic">
+                <div className="input-grafic">
+                  <Heading size="md">
+                    {" "}
+                    Expectativa de lucro x lucro real
+                  </Heading>
+                  <Select name="Categorias" required>
+                    <option value="Raiz">Ano</option>
+                  </Select>
+                </div>
+                <CardBody className="cards-grafic">
+                  <div style={{ height: "200px", width: "400px" }}>
+                    <GraficExpectation />
+                  </div>
+                </CardBody>
+              </Card>
+              <Card className="cards-grafic">
+                <div>
+                  <Heading size="md" style={{ marginTop: "20px" }}>
+                    Pedidos realizados x pedidos cancelados
+                  </Heading>
+                </div>
+                <CardBody className="cards-grafic">
+                  <div style={{ height: "205px", width: "400px" }}>
+                    <GraficPlacedCanceled />
+                  </div>
+                </CardBody>
+              </Card>
+            </div>
+            <div className="card-container">
+              <Card className="card-products">
+                <div className="card-products-container">
+                  <Center>
+                    <TableComponets />
+                  </Center>
+                </div>
+              </Card>
+            </div>
+          </GridItem>
+        </Grid>
+      </Container>
+    </AppWrapper>
   );
 };
 

@@ -32,7 +32,7 @@ const MainMenu: React.FC = () => {
             <Menu isLazy>
               <Text>Eduardo</Text>
               <MenuButton className="avatar">
-                <Avatar name="Eduardo" />
+                <Avatar name="Eduardo" style={{ backgroundColor: "#a59fc8" }} />
               </MenuButton>
               <MenuList>
                 <MenuItem>
