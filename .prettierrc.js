@@ -1,8 +1,7 @@
 module.exports = {
-  trailingComma: "all",
-  tabWidth: 2,
   semi: true,
-  arrowParens: "avoid",
-  endOfLine: "lf",
-  singleQuote: true, // Configura o Prettier para usar aspas duplas
+  trailingComma: 'all',
+  singleQuote: true,
+  printWidth: 80,
+  tabWidth: 2,
 };
