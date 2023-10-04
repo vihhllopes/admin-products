@@ -1,2 +1,4 @@
 [build]
-  base = "admin-products"
+base = "."
+command = "npm run build"
+publish = "./build/"
